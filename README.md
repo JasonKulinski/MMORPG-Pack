@@ -8,6 +8,7 @@ A Paper 26.3 server with an MMO RPG theme: classes, leveling, custom mobs, custo
 |---|---|
 | `RPGCore/` | The custom plugin (Java). Classes, stats, leveling, the stats book, custom mobs, spawn zones, custom blocks and items, and the resource pack host. |
 | `RPGWeapons/` | Weapons plugin (starter): weapons with stats and mana abilities, defined in `weapons.yml`. Depends on RPGCore. |
+| `RPGTowns/` | Towns plugin: a Planner NPC per town, player-designed buildings built in an empty world, 1-5 voting, and plots. Needs WorldEdit. |
 | `RPGCore/tools/` | Python scripts that draw the textures and build the resource pack (`make_pack.py`). |
 | `server-config/` | The server's config files: RPGCore settings (`classes.yml`, `mobs.yml`, `blocks.yml`, `items.yml`, `zones.yml`...), WorldEdit config, the `zone_skies` datapack (custom biomes) and `start.bat`. |
 | `docs/` | WorldEdit cheat sheet with all the terraforming brushes used for each zone. |
@@ -38,6 +39,8 @@ cd RPGCore
 gradle build
 cd ../RPGWeapons
 gradle build        # needs RPGCore built first
+cd ../RPGTowns
+gradle build
 ```
 
 The resource pack:
@@ -48,6 +51,31 @@ python tools/make_pack.py
 ```
 
 This writes `resourcepack/` and `RPGCore-pack.zip`. Custom block and item textures in `plugins/RPGCore/textures/` are added to the pack automatically by the plugin.
+
+## Towns (RPGTowns)
+
+Each town has a **Planner** NPC. Talking to it lets players:
+
+1. **Join** the town (one town per player).
+2. **Design a building**: pick a plot size and get sent to an empty world with a grass floor that size and a border around it. Build in creative (your real inventory is saved and given back when you leave), then submit it from the nether star menu. Drafts stay saved until you come back.
+3. **Vote on designs**: get sent to the design and vote 1-5 by right-clicking colored concrete (red 1 ... green 5).
+4. **Build on a plot**: residents claim one house plot; the Alderman builds on town plots. Only approved designs of the plot's size are offered.
+
+A design is **approved** when its average vote reaches the town's threshold (1-5, set by the Alderman from the Planner menu) with at least `voting.min-votes` votes (config.yml).
+
+Plot sizes (config.yml): houses 6×6×12, 8×8×16, 10×10×20; town buildings 16×16×32, 32×32×48.
+
+Admin setup for a town:
+
+```
+/towns create oakvale Oakvale
+/towns alderman oakvale <player>
+/towns npc oakvale                              (stand where the Planner should be)
+/towns plot create oakvale h1 house_small       (plot starts at your feet, goes +X/+Z)
+/towns plot show oakvale                        (outlines: green = houses, gold = town buildings)
+```
+
+Data: `towns.yml`, `designs.yml`, saved designs in `schematics/<id>.schem`, and the design world `rpgtowns_design`.
 
 ## Writing a plugin on top of RPGCore (e.g. RPGWeapons)
 
@@ -84,6 +112,8 @@ Rule of thumb: RPGCore owns the damage math. Other plugins give items stats and 
 | `/rpg block list` / `give <id>` | Custom blocks (list shows the WorldEdit name) |
 | `/rpg item list` / `give <id>` | Custom items and tools |
 | `/weapons list` / `give <id> [player]` | RPGWeapons weapons |
+| `/towns create`, `alderman`, `npc`, `plot create/remove/show`, `list`, `sizes` | RPGTowns admin setup |
+| `/towns leave` | Leave the design world |
 | `/rpg reload` | Reload all config files and resend the resource pack |
 
 ## Working together

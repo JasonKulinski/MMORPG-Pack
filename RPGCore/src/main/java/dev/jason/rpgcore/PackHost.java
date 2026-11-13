@@ -124,13 +124,25 @@ public class PackHost implements Listener {
 
     /** The address players download from. The hash on the end makes clients re-download after changes. */
     private String url() {
-        String host = plugin.getConfig().getString("resource-pack.host", "localhost");
+        return url(plugin.getConfig().getString("resource-pack.host", "auto"));
+    }
+
+    private String url(String host) {
         return "http://" + host + ":" + serverPort + PATH + "?v=" + HexFormat.of().formatHex(hash).substring(0, 12);
+    }
+
+    /** host: auto = the same address the player typed to join (LAN IP, public IP or domain). */
+    private String url(Player p) {
+        String host = plugin.getConfig().getString("resource-pack.host", "auto");
+        if (host.equalsIgnoreCase("auto")) {
+            host = p.getVirtualHost() != null ? p.getVirtualHost().getHostString() : "localhost";
+        }
+        return url(host);
     }
 
     public void send(Player p) {
         if (!enabled() || server == null || hash == null) return;
-        p.setResourcePack(PACK_ID, url(), hash,
+        p.setResourcePack(PACK_ID, url(p), hash,
                 MM.deserialize(plugin.getConfig().getString("resource-pack.prompt", "This server uses a resource pack.")),
                 plugin.getConfig().getBoolean("resource-pack.required", false));
     }

@@ -26,7 +26,7 @@ resource-pack:
   port: 8163
   # The address players use to download the pack. "localhost" works for you on this PC.
   # For friends, change it to the address they connect to (your LAN IP or public IP/domain) and open the port.
-  host: localhost
+  host: auto
   required: false
   prompt: "<gold>RPGCore</gold> <gray>uses a resource pack for menus and icons."
 

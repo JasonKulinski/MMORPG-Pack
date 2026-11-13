@@ -1,0 +1,14 @@
+name: RPGTowns
+version: 0.1.0
+main: dev.jason.rpgtowns.RPGTowns
+api-version: "1.21.4"
+description: Towns with a Planner NPC, player-designed buildings, voting, and plots.
+depend: [WorldEdit]
+commands:
+  towns:
+    description: RPGTowns commands
+    usage: /towns help
+permissions:
+  rpgtowns.admin:
+    description: Create towns, plots and NPCs, set Aldermen.
+    default: op

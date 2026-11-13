@@ -1,0 +1,16 @@
+# Plot sizes. width = width and length (plots are square), height = how tall builds can be.
+# house: true = player houses (residents claim one); false = town buildings (the Alderman builds them).
+sizes:
+  house_small:  {label: "Small house",  width: 6,  height: 12, house: true}
+  house_medium: {label: "Medium house", width: 8,  height: 16, house: true}
+  house_large:  {label: "Large house",  width: 10, height: 20, house: true}
+  town_medium:  {label: "Town building",       width: 16, height: 32, house: false}
+  town_large:   {label: "Large town building", width: 32, height: 48, house: false}
+
+voting:
+  # A design is approved when its average vote (1-5) reaches the town's threshold
+  # (set by the Alderman) and it has at least this many votes.
+  min-votes: 1
+
+# The empty world where designs are built and voted on.
+design-world: rpgtowns_design
