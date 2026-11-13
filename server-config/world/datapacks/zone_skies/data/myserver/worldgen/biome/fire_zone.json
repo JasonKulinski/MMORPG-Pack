@@ -1,0 +1,30 @@
+{
+  "attributes": {
+    "minecraft:visual/sky_color": "#d9592b",
+    "minecraft:visual/fog_color": "#b8502e",
+    "minecraft:visual/ambient_particles": [
+      {
+        "particle": { "type": "minecraft:ash" },
+        "probability": 0.04
+      }
+    ],
+    "minecraft:gameplay/snow_golem_melts": true,
+    "minecraft:gameplay/natural_mob_spawns": {
+      "argument": {
+        "spawn_costs": {},
+        "spawns_by_category": {}
+      },
+      "modifier": "overlay"
+    }
+  },
+  "carvers": [],
+  "downfall": 0.0,
+  "effects": {
+    "grass_color": "#8f6a35",
+    "foliage_color": "#8a5a2b",
+    "water_color": "#d9692b"
+  },
+  "features": [],
+  "has_precipitation": false,
+  "temperature": 2.0
+}

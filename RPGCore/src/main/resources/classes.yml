@@ -1,0 +1,244 @@
+# Class stats. Value at a level = base + per-level x (level - 1), up to the stat's cap.
+# Caps: damage_reduction 50, pierce 60, crit_chance 75, life_steal 25, slowness 40, poison 40, speed 50.
+# Edit, save, then /rpg reload in game.
+
+tank:
+  name: Tank
+  color: '#8a8f98'
+  lore: "None pass while you stand."
+  base:
+    health: 820.0
+    mana: 100.0
+    attack: 15.0
+    defense: 50.0
+    damage_reduction: 10.0
+    pierce: 0.0
+    crit_chance: 0.0
+    crit_damage: 50.0
+    life_steal: 0.0
+    slowness: 5.0
+    poison: 0.0
+    speed: 0.0
+  per-level:
+    health: 75.0
+    mana: 10.0
+    attack: 5.0
+    defense: 12.0
+    damage_reduction: 1.0
+    pierce: 0.5
+    crit_chance: 0.5
+    crit_damage: 1.5
+    life_steal: 0.0
+    slowness: 0.0
+    poison: 0.0
+    speed: 2.0
+knight:
+  name: Knight
+  color: '#c9a227'
+  lore: "Sworn steel and steady courage."
+  base:
+    health: 700.0
+    mana: 150.0
+    attack: 30.0
+    defense: 40.0
+    damage_reduction: 6.0
+    pierce: 10.0
+    crit_chance: 8.0
+    crit_damage: 80.0
+    life_steal: 0.0
+    slowness: 0.0
+    poison: 0.0
+    speed: 5.0
+  per-level:
+    health: 60.0
+    mana: 20.0
+    attack: 10.0
+    defense: 10.0
+    damage_reduction: 0.6
+    pierce: 0.7
+    crit_chance: 0.7
+    crit_damage: 2.0
+    life_steal: 0.0
+    slowness: 0.0
+    poison: 0.0
+    speed: 0.2
+swift:
+  name: Swift
+  color: '#7fd3ff'
+  lore: "Strike first, strike twice, then vanish."
+  base:
+    health: 500.0
+    mana: 150.0
+    attack: 25.0
+    defense: 10.0
+    damage_reduction: 0.0
+    pierce: 15.0
+    crit_chance: 15.0
+    crit_damage: 100.0
+    life_steal: 0.0
+    slowness: 0.0
+    poison: 5.0
+    speed: 20.0
+  per-level:
+    health: 35.0
+    mana: 20.0
+    attack: 8.0
+    defense: 3.0
+    damage_reduction: 0.0
+    pierce: 0.9
+    crit_chance: 1.2
+    crit_damage: 3.0
+    life_steal: 0.0
+    slowness: 0.0
+    poison: 0.2
+    speed: 0.6
+fire:
+  name: Fire
+  color: '#ff6a1f'
+  lore: "Burn bright. Burn everything."
+  base:
+    health: 480.0
+    mana: 250.0
+    attack: 40.0
+    defense: 20.0
+    damage_reduction: 0.0
+    pierce: 10.0
+    crit_chance: 10.0
+    crit_damage: 110.0
+    life_steal: 0.0
+    slowness: 0.0
+    poison: 0.0
+    speed: 10.0
+  per-level:
+    health: 30.0
+    mana: 40.0
+    attack: 12.0
+    defense: 5.0
+    damage_reduction: 0.0
+    pierce: 0.7
+    crit_chance: 0.9
+    crit_damage: 3.0
+    life_steal: 0.0
+    slowness: 0.0
+    poison: 0.0
+    speed: 0.3
+arcane:
+  name: Arcane
+  color: '#9b4dff'
+  lore: "Venom and spells, in equal measure."
+  base:
+    health: 480.0
+    mana: 300.0
+    attack: 22.0
+    defense: 10.0
+    damage_reduction: 0.0
+    pierce: 15.0
+    crit_chance: 5.0
+    crit_damage: 65.0
+    life_steal: 0.0
+    slowness: 5.0
+    poison: 20.0
+    speed: 10.0
+  per-level:
+    health: 30.0
+    mana: 50.0
+    attack: 7.0
+    defense: 3.0
+    damage_reduction: 0.0
+    pierce: 0.9
+    crit_chance: 0.5
+    crit_damage: 1.5
+    life_steal: 0.0
+    slowness: 0.2
+    poison: 0.4
+    speed: 0.3
+death:
+  name: Death
+  color: '#5a2a7a'
+  lore: "What you take from the living, you keep."
+  base:
+    health: 600.0
+    mana: 200.0
+    attack: 25.0
+    defense: 20.0
+    damage_reduction: 3.0
+    pierce: 10.0
+    crit_chance: 5.0
+    crit_damage: 65.0
+    life_steal: 12.0
+    slowness: 5.0
+    poison: 10.0
+    speed: 5.0
+  per-level:
+    health: 45.0
+    mana: 30.0
+    attack: 8.0
+    defense: 5.0
+    damage_reduction: 0.3
+    pierce: 0.7
+    crit_chance: 0.6
+    crit_damage: 1.5
+    life_steal: 0.25
+    slowness: 0.2
+    poison: 0.3
+    speed: 0.2
+frost:
+  name: Frost
+  color: '#bfe9ff'
+  lore: "Every step they take grows heavier."
+  base:
+    health: 600.0
+    mana: 250.0
+    attack: 22.0
+    defense: 30.0
+    damage_reduction: 4.0
+    pierce: 5.0
+    crit_chance: 5.0
+    crit_damage: 65.0
+    life_steal: 0.0
+    slowness: 20.0
+    poison: 0.0
+    speed: 5.0
+  per-level:
+    health: 45.0
+    mana: 40.0
+    attack: 7.0
+    defense: 7.0
+    damage_reduction: 0.4
+    pierce: 0.5
+    crit_chance: 0.5
+    crit_damage: 1.5
+    life_steal: 0.0
+    slowness: 0.4
+    poison: 0.0
+    speed: 0.2
+life:
+  name: Life
+  color: '#4fc95a'
+  lore: "Where you walk, the wounded rise."
+  base:
+    health: 650.0
+    mana: 300.0
+    attack: 8.0
+    defense: 30.0
+    damage_reduction: 4.0
+    pierce: 0.0
+    crit_chance: 0.0
+    crit_damage: 50.0
+    life_steal: 5.0
+    slowness: 0.0
+    poison: 0.0
+    speed: 10.0
+  per-level:
+    health: 55.0
+    mana: 50.0
+    attack: 3.0
+    defense: 7.0
+    damage_reduction: 0.4
+    pierce: 0.0
+    crit_chance: 0.3
+    crit_damage: 0.5
+    life_steal: 0.2
+    slowness: 0.0
+    poison: 0.0
+    speed: 0.3

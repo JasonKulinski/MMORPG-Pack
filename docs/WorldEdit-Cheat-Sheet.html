@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WorldEdit Cheat Sheet</title>
+<style>
+:root { --bg:#f7f7f5; --fg:#1d1f1c; --muted:#5b605a; --card:#fff; --line:#dfe2dc; --code:#eef2ea; --accent:#3d7a3a; }
+@media (prefers-color-scheme: dark) { :root { --bg:#161815; --fg:#e7eae4; --muted:#a3a99f; --card:#1f221e; --line:#30352e; --code:#272c25; --accent:#7cc276; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.55 system-ui, Segoe UI, sans-serif; }
+nav { position:sticky; top:0; background:var(--bg); border-bottom:1px solid var(--line); padding:10px 16px; display:flex; flex-wrap:wrap; gap:6px 14px; z-index:1; }
+nav a { color:var(--accent); text-decoration:none; font-weight:600; font-size:14px; }
+main { max-width:1000px; margin:0 auto; padding:16px; }
+h1 { margin:8px 0 4px; } h2 { margin:32px 0 10px; padding-top:8px; border-top:2px solid var(--line); scroll-margin-top:60px; } h3 { margin:20px 0 8px; }
+p.lead { color:var(--muted); margin-top:0; }
+code { background:var(--code); padding:1px 5px; border-radius:4px; font:13.5px Consolas, monospace; word-break:break-word; }
+table { width:100%; border-collapse:collapse; background:var(--card); margin:8px 0; }
+th, td { border:1px solid var(--line); padding:7px 9px; text-align:left; vertical-align:top; }
+th { background:var(--code); } li { margin:4px 0; } a { color:var(--accent); }
+</style></head><body>
+<nav><a href="#ground-rules">Ground rules</a><a href="#masks">Masks</a><a href="#selections-and-shapes">Selections and shapes</a><a href="#brushes">Brushes</a><a href="#water-and-rivers">Water and rivers</a><a href="#trees-and-plants">Trees and plants</a><a href="#clearing">Clearing</a><a href="#zone-palettes">Zone palettes</a><a href="#biomes-and-custom-skies">Biomes and custom skies</a><a href="#structure-templates">Structure templates</a><a href="#server-and-utilities">Server and utilities</a></nav>
+<main><h1>WorldEdit Cheat Sheet</h1>
+<p class="lead">Paper 26.3 + WorldEdit 7.4.6. Updated Oct 20, 2026. Press Ctrl+F to search.</p>
+<h2 id="ground-rules">Ground rules</h2>
+<ul>
+<li><strong>Two slashes</strong> (<code>//</code>) for commands that change the world: <code>//brush</code>, <code>//set</code>, <code>//replace</code>, <code>//gmask</code>, <code>//undo</code>.</li>
+<li><strong>One slash</strong> (<code>/</code>) for settings on the brush you're holding: <code>/mask</code>, <code>/size</code>, <code>/mat</code>, <code>/range</code>, <code>/none</code>.</li>
+<li><strong>Brush first, then mask.</strong> Re-running a <code>//brush</code> line makes a new brush and wipes its mask. Change size with <code>/size 12</code> instead of retyping the brush.</li>
+<li><strong>Type each command on its own line.</strong> Pasting a brush and its mask together makes WorldEdit reject them.</li>
+<li><strong>Masks belong to the item you're holding.</strong> Put each brush on its own item. <code>/mask</code> alone clears it.</li>
+<li><strong>Global mask</strong> (<code>//gmask ...</code>) affects every tool, including paste. Always turn it off afterward with <code>//gmask</code>.</li>
+<li><strong>Undo / redo:</strong> <code>//undo</code>, <code>//redo</code>. <strong>Wand:</strong> <code>//wand</code>, then left-click and right-click two corners.</li>
+<li><strong>Brush size limit</strong> is 100 (raised in WorldEdit's config). After config edits, run <code>/worldedit reload</code>.</li>
+</ul>
+<h2 id="masks">Masks</h2>
+<table>
+<thead>
+<tr>
+<th>Mask</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/mask air</code></td>
+<td>Only fills empty space; never replaces anything</td>
+</tr>
+<tr>
+<td><code>/mask stone</code></td>
+<td>Only changes stone</td>
+</tr>
+<tr>
+<td><code>/mask grass_block,dirt</code></td>
+<td>Several blocks: comma, no spaces</td>
+</tr>
+<tr>
+<td><code>/mask !stone</code></td>
+<td>Everything except stone</td>
+</tr>
+<tr>
+<td><code>/mask &gt;grass_block</code></td>
+<td>Only the block sitting on top of grass</td>
+</tr>
+<tr>
+<td><code>/mask =y&gt;67</code></td>
+<td>Only above Y 67 (<code>=y&lt;67</code> below, <code>=y&gt;=60&amp;&amp;y&lt;=80</code> between)</td>
+</tr>
+<tr>
+<td><code>//gmask air</code> + a brush <code>/mask</code></td>
+<td>Both apply together (AND)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Placing plants on top:</strong> use <code>/mask &gt;grass_block,podzol,...</code> but never list <code>dirt</code>, because grass sits on dirt and the brush hits the grass. If the ground is several layers of the same block, also run <code>//gmask air</code>.</li>
+<li><strong>Two conditions at once:</strong> <code>/mask</code> takes only one. Put the second in <code>//gmask</code>, for example <code>//gmask =y&gt;64</code> plus <code>/mask stone</code>.</li>
+</ul>
+<h2 id="selections-and-shapes">Selections and shapes</h2>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>//pos1 2366,50,914</code></td>
+<td>Set a corner by coordinates (<code>//pos2</code> the same way)</td>
+</tr>
+<tr>
+<td><code>//hpos1</code>, <code>//hpos2</code></td>
+<td>Select the block you're looking at</td>
+</tr>
+<tr>
+<td><code>//expand 3 right</code></td>
+<td>Grow the selection (<code>left</code>, <code>up</code>, <code>down</code>, <code>forward</code>, <code>back</code>)</td>
+</tr>
+<tr>
+<td><code>//set sand</code></td>
+<td>Fill the selection</td>
+</tr>
+<tr>
+<td><code>//replace sand stone</code></td>
+<td>Swap one block for another in the selection</td>
+</tr>
+<tr>
+<td><code>//replace !stone sand</code></td>
+<td>Replace everything except stone</td>
+</tr>
+<tr>
+<td><code>//replace cherry_leaves 85%cherry_leaves,15%flowering_azalea_leaves</code></td>
+<td>Replace a percentage</td>
+</tr>
+<tr>
+<td><code>//walls stone_bricks</code></td>
+<td>Only the outer walls of the selection</td>
+</tr>
+<tr>
+<td><code>//sphere sand 5</code></td>
+<td>Sphere around you (<code>//sphere sand 5 true</code> sits on the ground)</td>
+</tr>
+<tr>
+<td><code>//hsphere sand 5</code></td>
+<td>Hollow sphere</td>
+</tr>
+<tr>
+<td><code>//cyl cherry_wood 5 10</code></td>
+<td>Cylinder, radius 5, 10 tall (<code>//hcyl</code> hollow)</td>
+</tr>
+<tr>
+<td><code>//fill dirt 10</code></td>
+<td>Fill a hole below you (<code>//fillr</code> includes caves)</td>
+</tr>
+<tr>
+<td><code>//copy -m bone_block</code></td>
+<td>Copy only certain blocks</td>
+</tr>
+<tr>
+<td><code>//paste -a</code></td>
+<td>Paste without the copy's air erasing things</td>
+</tr>
+<tr>
+<td><code>//rotate 180</code>, <code>//flip down</code></td>
+<td>Turn or flip the clipboard</td>
+</tr>
+<tr>
+<td><code>//schem save name</code>, <code>//schem load name</code></td>
+<td>Save and reload a copied build</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Exact box (4 wide, 5 long, 10 tall):</strong> stand at a corner, then <code>//pos1</code>, <code>//pos2</code>, <code>//expand 3 right</code>, <code>//expand 4 forward</code>, <code>//expand 9 up</code>, <code>//set stone</code>. Each expand is one less than the size.</p>
+<p><strong>3×3 hole, 1 deep:</strong> look at the center block, <code>//hpos1</code>, <code>//hpos2</code>, <code>//expand 1 left</code>, <code>//expand 1 right</code>, <code>//expand 1 up</code>, <code>//expand 1 down</code>, <code>//set air</code>.</p>
+<h2 id="brushes">Brushes</h2>
+<table>
+<thead>
+<tr>
+<th>Brush</th>
+<th>Usual mask</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>//brush sphere sand 5</code></td>
+<td><code>/mask air</code></td>
+<td>Dome on the ground, keeps what's under it</td>
+</tr>
+<tr>
+<td><code>//brush cylinder cherry_wood 5 10</code></td>
+<td><code>/mask air</code></td>
+<td>Pillar built up from the clicked block</td>
+</tr>
+<tr>
+<td><code>//brush cylinder air 3 -5</code></td>
+<td>none</td>
+<td>Straight-walled pit going down</td>
+</tr>
+<tr>
+<td><code>//brush apply cuboid 2 set sand</code></td>
+<td>optional</td>
+<td>5×5×5 cube (<code>1</code> = 3 wide, <code>3</code> = 7 wide)</td>
+</tr>
+<tr>
+<td><code>//brush clipboard -a -o</code></td>
+<td>none</td>
+<td>Pastes your clipboard where you click</td>
+</tr>
+<tr>
+<td><code>//brush smooth 5 4</code></td>
+<td>none</td>
+<td>Smooths terrain (radius, passes)</td>
+</tr>
+<tr>
+<td><code>//brush erode 3</code> / <code>//brush dilate 3</code></td>
+<td>none</td>
+<td>Knock off bumps / fill dents, any direction</td>
+</tr>
+<tr>
+<td><code>//brush deform sphere 5 y+=3</code></td>
+<td>none</td>
+<td>Lowers terrain 3 per click</td>
+</tr>
+<tr>
+<td><code>//brush deform sphere 5 y-=3</code></td>
+<td>none</td>
+<td>Raises terrain 3 per click</td>
+</tr>
+<tr>
+<td><code>//brush sphere air 3</code></td>
+<td>none</td>
+<td>Digs a round hole</td>
+</tr>
+<tr>
+<td><code>//brush sphere 70%andesite,30%stone 4</code></td>
+<td><code>/mask stone</code></td>
+<td>Rock pockets inside a mountain</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Any exact shape as a brush:</strong> build it once, <code>//copy</code>, <code>//set air</code>, then <code>//brush clipboard -a -o</code> on an item.</p>
+<p><strong>Smooth an underside:</strong> select it, <code>//copy</code>, <code>//flip down</code>, <code>//paste</code>, smooth, then flip back.</p>
+<h3>Caves</h3>
+<ol>
+<li><strong>Carve:</strong> <code>//brush sphere air 4</code>, changing <code>/size</code> between 3 and 7.</li>
+<li><strong>Roughen:</strong> alternate <code>//brush erode 3</code> and <code>//brush dilate 3</code>.</li>
+<li><strong>Texture walls:</strong> <code>//brush sphere 50%stone,20%andesite,15%tuff,10%cobblestone,5%mossy_cobblestone 4</code> with <code>/mask stone</code>.</li>
+<li><strong>Details by hand:</strong> dripstone, glow lichen, cave vines with glow berries.</li>
+</ol>
+<h2 id="water-and-rivers">Water and rivers</h2>
+<ol>
+<li><strong>Carve a U channel:</strong> <code>//brush cylinder air 3 -5</code>, clicking along the ground surface.</li>
+<li><strong>Flat bottom (optional):</strong> <code>//gmask =y&gt;=60</code> at your riverbed height, then <code>//gmask</code> to clear.</li>
+<li><strong>Round the banks:</strong> <code>//brush smooth 3 2</code> on the top edges.</li>
+<li><strong>Riverbed:</strong> clear the gmask first, then <code>//brush sphere 50%sand,30%gravel,20%clay 3</code> with <code>/mask dirt,grass_block,coarse_dirt,stone,andesite,diorite,granite,tuff</code>. Swampy: <code>40%mud,30%clay,30%gravel</code>. Rocky stream: <code>50%gravel,30%cobblestone,20%mossy_cobblestone</code>.</li>
+<li>
+<p><strong>Fill:</strong> stand at the water height and run <code>//fill water 15</code>. Or brush: <code>//gmask =y&lt;=63</code>, <code>//brush sphere water 5</code>, <code>/mask air</code>.</p>
+</li>
+<li>
+<p><strong>One shallow layer on the bed:</strong> <code>//gmask air</code>, <code>//brush sphere water 5</code>, <code>/mask &gt;sand,gravel,clay</code>.</p>
+</li>
+<li><strong>Flat single layer at one height:</strong> <code>//gmask =y==62</code> and the water brush with <code>/mask air</code>.</li>
+<li><strong>Freeze a pond:</strong> select it, <code>//replace water ice</code>.</li>
+</ol>
+<h2 id="trees-and-plants">Trees and plants</h2>
+<p><strong>Forest brush:</strong> <code>//brush forest cylinder 8 3 dark_oak</code> (radius 8, 3% density). Use Minecraft's names with underscores, and never names starting with <code>trees_</code> (they crash).</p>
+<table>
+<thead>
+<tr>
+<th>Tree name</th>
+<th>Look</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>oak</code>, <code>fancy_oak</code></td>
+<td>Plain oak / big sprawling oak</td>
+</tr>
+<tr>
+<td><code>dark_oak</code></td>
+<td>Thick, bushy canopy</td>
+</tr>
+<tr>
+<td><code>azalea_tree</code></td>
+<td>Small tree with pink and green flowers</td>
+</tr>
+<tr>
+<td><code>jungle_bush</code></td>
+<td>Leafy shrubs for gaps</td>
+</tr>
+<tr>
+<td><code>swamp_oak</code></td>
+<td>Oak with hanging vines</td>
+</tr>
+<tr>
+<td><code>jungle_tree</code>, <code>mega_jungle_tree</code></td>
+<td>Tall and lush</td>
+</tr>
+<tr>
+<td><code>cherry</code>, <code>birch</code>, <code>mangrove</code>, <code>spruce</code></td>
+<td>Other options</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Leaves on branches:</strong> <code>//brush sphere cherry_leaves[persistent=true] 3</code> with <code>/mask air</code>. <code>[persistent=true]</code> stops decay.</li>
+<li><strong>Square shrubs:</strong> <code>//brush apply cuboid 1 set spruce_leaves[persistent=true]</code> with <code>/mask air</code>.</li>
+<li><strong>Round shrubs:</strong> <code>//brush sphere spruce_leaves[persistent=true] 1</code> with <code>/mask air</code>.</li>
+<li><strong>Scattered leaf cubes:</strong> <code>//brush sphere 92%air,8%spruce_leaves[persistent=true] 6</code> with <code>/mask &gt;grass_block,podzol,coarse_dirt,moss_block,snow_block</code>.</li>
+<li><strong>Protect existing bushes from a plant brush:</strong> <code>//gmask !spruce_leaves</code>.</li>
+<li><strong>Quick flowers in a selection:</strong> <code>//flora 10</code>.</li>
+</ul>
+<p><strong>Ground cover (meadow):</strong> <code>//brush sphere 50%air,18%short_grass,10%fern,6%bush,6%moss_carpet,4%azalea,2%flowering_azalea,2%firefly_bush,2%lily_of_the_valley 5</code> with <code>/mask &gt;grass_block,moss_block,podzol</code></p>
+<p><strong>Flower patches:</strong> <code>//brush sphere 40%air,20%wildflowers,15%pink_petals,8%azure_bluet,7%oxeye_daisy,5%cornflower,5%allium 3</code> with <code>/mask &gt;grass_block,moss_block,podzol</code></p>
+<p><strong>Spruce forest floor:</strong> first <code>//brush sphere 50%podzol,30%grass_block,15%coarse_dirt,5%moss_block 5</code> with <code>/mask grass_block</code>, then plants <code>//brush sphere 55%air,20%fern,12%short_grass,5%sweet_berry_bush[age=3],4%brown_mushroom,2%red_mushroom,2%moss_carpet 5</code> with <code>/mask &gt;grass_block,podzol,coarse_dirt,moss_block</code></p>
+<p>Two-block plants (<code>tall_grass</code>, <code>large_fern</code>) only place their bottom half from a brush; add them by hand.</p>
+<h2 id="clearing">Clearing</h2>
+<p>All use <code>//brush sphere air 8</code>, then the mask. Never add <code>grass_block</code>.</p>
+<ul>
+<li><strong>Oak and birch forest:</strong> <code>/mask oak_log,oak_wood,oak_leaves,birch_log,birch_wood,birch_leaves,leaf_litter,short_grass,tall_grass,vine,bee_nest</code></li>
+<li><strong>Spruce forest:</strong> <code>/mask spruce_log,spruce_wood,spruce_leaves,short_grass,tall_grass,fern,large_fern,sweet_berry_bush,brown_mushroom,red_mushroom,leaf_litter</code></li>
+<li><strong>Big cube of air:</strong> <code>//brush apply cuboid 4 set air</code> (9×9×9)</li>
+<li><strong>Dropped items:</strong> <code>/kill @e[type=item]</code></li>
+</ul>
+<h2 id="zone-palettes">Zone palettes</h2>
+<p>Ground brushes use <code>/mask grass_block</code>. Wall brushes use <code>/mask stone</code>. Detail brushes use the <code>&gt;</code> mask shown.</p>
+<h3>Life (lush moss)</h3>
+<ul>
+<li><strong>Ground edge:</strong> <code>//brush sphere 70%grass_block,25%moss_block,5%rooted_dirt 5</code></li>
+<li><strong>Ground center:</strong> <code>//brush sphere 50%moss_block,35%grass_block,15%rooted_dirt 5</code> (deeper green: add <code>10%green_concrete_powder</code>)</li>
+<li><strong>Mossy cliffs:</strong> <code>//brush sphere 40%moss_block,30%mossy_cobblestone,30%stone 4</code></li>
+<li><strong>Plants:</strong> <code>//brush sphere 60%air,15%moss_carpet,8%fern,6%short_grass,5%azalea,3%flowering_azalea,3%pink_petals 5</code> with <code>/mask &gt;grass_block,moss_block</code></li>
+<li><strong>Light:</strong> glow berries, shroomlight, invisible <code>light</code> block. <strong>Biome:</strong> <code>dark_forest</code> or <code>jungle</code>.</li>
+</ul>
+<h3>Cherry grove</h3>
+<ul>
+<li><strong>Logs:</strong> <code>//replace cherry_wood 73%cherry_wood,15%mangrove_wood,10%dark_oak_wood,2%shroomlight</code></li>
+<li><strong>Canopy lights:</strong> <code>//replace cherry_leaves 95%cherry_leaves[persistent=true],5%pearlescent_froglight</code></li>
+<li><strong>Ground:</strong> pink petals; lanterns on chains.</li>
+</ul>
+<h3>Enchanted meadow</h3>
+<ul>
+<li><strong>Ground:</strong> <code>//brush sphere 55%grass_block,20%podzol,15%moss_block,10%coarse_dirt 5</code></li>
+<li><strong>Plants:</strong> <code>//brush sphere 55%air,15%short_grass,8%fern,6%wildflowers,4%oxeye_daisy,4%azure_bluet,3%allium,3%lily_of_the_valley,2%firefly_bush 5</code> with <code>/mask &gt;grass_block,podzol,moss_block</code></li>
+<li><strong>Biome:</strong> <code>meadow</code> or <code>flower_forest</code>.</li>
+</ul>
+<h3>Winter</h3>
+<ul>
+<li><strong>Snowfall:</strong> <code>//snow 10</code> (undo with <code>//thaw 10</code>)</li>
+<li><strong>Ground:</strong> <code>//brush sphere 60%snow_block,20%grass_block[snowy=true],12%packed_ice,8%blue_ice 5</code></li>
+<li><strong>Snow drifts:</strong> <code>//brush sphere 50%snow,30%snow[layers=2],15%snow[layers=3],5%snow[layers=4] 5</code> with <code>/mask &gt;grass_block,snow_block</code></li>
+<li><strong>Icy rock:</strong> <code>//brush sphere 40%packed_ice,35%blue_ice,25%ice 4</code></li>
+<li><strong>Plants:</strong> <code>//brush sphere 75%air,8%fern,7%short_grass,5%dead_bush,3%sweet_berry_bush,2%lily_of_the_valley 4</code> with <code>/mask &gt;grass_block,snow_block</code></li>
+<li><strong>Biome:</strong> <code>snowy_plains</code>, <code>snowy_taiga</code>, <code>grove</code>. Avoid <code>powder_snow</code>.</li>
+</ul>
+<h3>Swift (wind and sky)</h3>
+<ul>
+<li><strong>Spires:</strong> <code>//cyl 50%calcite,30%diorite,20%smooth_stone 3 25</code></li>
+<li><strong>Cliffs:</strong> <code>//brush sphere 45%calcite,30%diorite,15%smooth_stone,10%tuff 4</code></li>
+<li><strong>Plants:</strong> <code>//brush sphere 60%air,25%short_grass,10%azure_bluet,5%oxeye_daisy 5</code> with <code>/mask &gt;grass_block,coarse_dirt</code></li>
+<li><strong>Biome:</strong> <code>stony_peaks</code> or <code>windswept_hills</code>. Birch trees, arches, floating islands.</li>
+</ul>
+<h3>Tank (rugged fortress)</h3>
+<ul>
+<li><strong>Ground:</strong> <code>//brush sphere 35%coarse_dirt,25%packed_mud,15%gravel,10%cobblestone,10%andesite,5%rooted_dirt 5</code></li>
+<li><strong>Cliffs:</strong> <code>//brush sphere 35%deepslate,25%cobbled_deepslate,20%tuff,15%andesite,5%cobblestone 4</code></li>
+<li><strong>Built walls:</strong> <code>//walls 40%stone_bricks,25%cracked_stone_bricks,20%mossy_stone_bricks,15%andesite</code></li>
+<li><strong>Plants:</strong> <code>//brush sphere 85%air,8%short_grass,4%dead_bush,3%fern 5</code> with <code>/mask &gt;coarse_dirt,packed_mud,gravel,grass_block</code></li>
+<li><strong>Biome:</strong> <code>windswept_gravelly_hills</code>.</li>
+</ul>
+<h3>Fire (volcanic)</h3>
+<ul>
+<li><strong>Ground:</strong> <code>//brush sphere 35%blackstone,25%basalt,15%coarse_dirt,10%red_sand,10%netherrack,5%magma_block 5</code> (magma burns; keep it off paths)</li>
+<li><strong>Cliffs:</strong> <code>//brush sphere 30%blackstone,20%basalt,20%orange_terracotta,15%red_terracotta,10%terracotta,5%magma_block 4</code></li>
+<li><strong>Built walls:</strong> <code>//walls 40%polished_blackstone_bricks,25%cracked_polished_blackstone_bricks,20%nether_bricks,15%red_nether_bricks</code></li>
+<li><strong>Details:</strong> <code>//brush sphere 88%air,6%dead_bush,4%crimson_roots,2%fire 5</code> with <code>/mask &gt;blackstone,basalt,coarse_dirt,red_sand,netherrack</code> (plus <code>//gmask air</code>)</li>
+<li><strong>Biome:</strong> <code>myserver:fire_zone</code> (custom orange sky).</li>
+</ul>
+<h3>Death</h3>
+<ul>
+<li><strong>Ground:</strong> <code>//brush sphere 30%soul_soil,20%coarse_dirt,15%gray_concrete_powder,15%podzol,10%soul_sand,10%gravel 5</code> with <code>/mask grass_block</code> only (not dirt)</li>
+<li><strong>Cliffs:</strong> <code>//brush sphere 35%deepslate,25%blackstone,15%tuff,15%cobbled_deepslate,10%basalt 4</code></li>
+<li><strong>Built walls:</strong> <code>//walls 35%cracked_deepslate_bricks,25%deepslate_bricks,20%polished_blackstone_bricks,10%cracked_polished_blackstone_bricks,10%deepslate_tiles</code></li>
+<li><strong>Details:</strong> <code>//brush sphere 88%air,6%dead_bush,3%short_grass,2%cobweb,1%soul_fire 5</code>, then <code>/mask &gt;soul_soil,coarse_dirt,podzol,gravel,grass_block</code>, then <code>//gmask air</code></li>
+<li><strong>Light:</strong> soul lanterns, soul torches, crying obsidian. Wither roses only where players can't walk; no sculk shriekers.</li>
+<li><strong>Biome:</strong> <code>myserver:death_zone</code> (black sky, dark purple water).</li>
+</ul>
+<h2 id="biomes-and-custom-skies">Biomes and custom skies</h2>
+<ul>
+<li><strong>Biome brush:</strong> <code>//brush biome -c sphere 7 &lt;biome&gt;</code>. <strong>Selection:</strong> <code>//setbiome &lt;biome&gt;</code>. Rejoin to see changes.</li>
+<li><strong>Mountain biomes:</strong> <code>stony_peaks</code>, <code>windswept_hills</code>, <code>meadow</code>, <code>jagged_peaks</code>, <code>frozen_peaks</code>, <code>grove</code>, <code>snowy_slopes</code>.</li>
+<li><strong>Custom (datapack <code>zone_skies</code>):</strong> <code>myserver:fire_zone</code> has an orange-red sky, red haze, ash, and orange water. <code>myserver:death_zone</code> has a black sky, dark purple water, ash, and dead grass. Both have no mob spawns.</li>
+<li><strong>Datapack location:</strong> <code>world\datapacks\zone_skies</code>. New biomes need a server restart.</li>
+<li><strong>Find biomes:</strong> <code>/locate biome minecraft:cherry_grove</code>, or your seed (<code>/seed</code>) in <a href="https://www.chunkbase.com/apps/biome-finder">Chunkbase Biome Finder</a>.</li>
+<li>Biomes snap to 4-block chunks. Lower Options → Video Settings → Biome Blend for sharper edges.</li>
+</ul>
+<h2 id="structure-templates">Structure templates</h2>
+<p>Build once, save it, and paste it around. Make 2–3 variants of each piece.</p>
+<ol>
+<li><strong>Save:</strong> select the build, stand where it should line up, then <code>//copy</code> (or <code>//copy -m bone_block,...</code> for specific blocks) and <code>//schem save name</code>.</li>
+<li><strong>Place:</strong> <code>//schem load name</code>, then <code>//rotate 90</code> if needed, then <code>//paste -a</code>. Sink some a block or two lower so they look buried.</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Piece</th>
+<th>Size</th>
+<th>Idea</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gravestone</td>
+<td>Small</td>
+<td>Stone/deepslate slab and wall, cracked, mossy</td>
+</tr>
+<tr>
+<td>Soul lantern post</td>
+<td>Small</td>
+<td>Fence or chain with a hanging soul lantern</td>
+</tr>
+<tr>
+<td>Dead tree</td>
+<td>Small</td>
+<td>Stripped dark oak or pale oak, no leaves, cobwebs</td>
+</tr>
+<tr>
+<td>Bone arch</td>
+<td>Medium</td>
+<td>Already built</td>
+</tr>
+<tr>
+<td>Ribcage</td>
+<td>Medium</td>
+<td>Half-buried curved rows of bone blocks</td>
+</tr>
+<tr>
+<td>Giant skull</td>
+<td>Medium</td>
+<td>Bone blocks with soul-fire eyes, half sunk</td>
+</tr>
+<tr>
+<td>Ruined pillar</td>
+<td>Medium</td>
+<td>Broken cracked deepslate brick columns</td>
+</tr>
+<tr>
+<td>Crypt entrance</td>
+<td>Large</td>
+<td>Dark doorway into a hill, stairs down</td>
+</tr>
+<tr>
+<td>Spine bridge</td>
+<td>Large</td>
+<td>Bone-block backbone across the purple lake</td>
+</tr>
+</tbody>
+</table>
+<h2 id="server-and-utilities">Server and utilities</h2>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>start.bat</code></td>
+<td>Starts the server (in <code>C:\Users\hunte\Documents\minecraft-server</code>); type <code>stop</code> to stop</td>
+</tr>
+<tr>
+<td><code>whitelist add &lt;name&gt;</code></td>
+<td>Let a player join (server console)</td>
+</tr>
+<tr>
+<td><code>op &lt;name&gt;</code></td>
+<td>Give command and WorldEdit access (server console)</td>
+</tr>
+<tr>
+<td><code>/tp @s &lt;X&gt; 150 &lt;Z&gt;</code></td>
+<td>Teleport to coordinates</td>
+</tr>
+<tr>
+<td><code>/effect give @s speed infinite 5 true</code></td>
+<td>Faster walking; <code>/effect clear @s</code> removes it</td>
+</tr>
+<tr>
+<td><code>/time set day</code>, <code>/weather clear</code></td>
+<td>Time and weather</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Join:</strong> Minecraft Java → Multiplayer → Direct Connection → <code>localhost</code>.</li>
+<li><strong>Fast travel:</strong> hold a compass. Left-click jumps to the block you look at; right-click passes through walls.</li>
+</ul>
+</main></body></html>

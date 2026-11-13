@@ -1,0 +1,53 @@
+# Custom enemies. Only these give RPG XP. Stand-in looks for now (vanilla mobs + gear).
+# type: any Minecraft entity type. health/damage use the same scale as class Health (a level 1 Tank has 820).
+# speed 0 = vanilla speed.
+# defense works like player Defense (reduction = def / (def + 100)). scale 1 = normal size.
+# equipment slots: head, chest, legs, feet, hand, offhand. leather-color tints leather armor.
+
+ghoul:
+  type: ZOMBIE
+  name: "<dark_gray>Ghoul"
+  health: 200
+  damage: 80
+  speed: 0.24
+  defense: 10
+  xp: 3
+  leather-color: "#2b2b2b"
+  equipment:
+    chest: leather_chestplate
+    legs: leather_leggings
+
+bone_archer:
+  type: SKELETON
+  name: "<gray>Bone Archer"
+  health: 160
+  damage: 65
+  defense: 5
+  xp: 3
+  equipment:
+    hand: bow
+
+crypt_knight:
+  type: WITHER_SKELETON
+  name: "<dark_purple>Crypt Knight"
+  health: 450
+  damage: 130
+  speed: 0.26
+  defense: 25
+  xp: 8
+  equipment:
+    head: netherite_helmet
+    hand: stone_sword
+
+bone_colossus:
+  type: WITHER_SKELETON
+  name: "<red><bold>Bone Colossus"
+  health: 2500
+  damage: 250
+  speed: 0.22
+  scale: 1.8
+  defense: 40
+  xp: 40
+  equipment:
+    head: wither_skeleton_skull
+    hand: netherite_axe

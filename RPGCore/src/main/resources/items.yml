@@ -1,0 +1,48 @@
+# Custom items. Each works like its vanilla base item (same damage, mining speed and durability),
+# with its own name, texture and crafting recipe. After editing: /rpg reload.
+#
+#   name:     item name (MiniMessage colors work)
+#   base:     the vanilla item it works like, e.g. stone_pickaxe, iron_sword, stick
+#   texture:  a 16x16 PNG in plugins/RPGCore/textures/item/ (without .png)
+#   recipe:   shape = 3 rows (spaces are empty slots); keys = what each letter is:
+#             a vanilla item (stick), a custom block (block:black_cobblestone) or a custom item (item:<id>)
+
+black_stone_sword:
+  name: "<#6a6275>Black Stone Sword"
+  base: stone_sword
+  texture: black_stone_sword
+  recipe:
+    shape: [" B ", " B ", " S "]
+    keys: {B: "block:black_cobblestone", S: stick}
+
+black_stone_pickaxe:
+  name: "<#6a6275>Black Stone Pickaxe"
+  base: stone_pickaxe
+  texture: black_stone_pickaxe
+  recipe:
+    shape: ["BBB", " S ", " S "]
+    keys: {B: "block:black_cobblestone", S: stick}
+
+black_stone_axe:
+  name: "<#6a6275>Black Stone Axe"
+  base: stone_axe
+  texture: black_stone_axe
+  recipe:
+    shape: ["BB ", "BS ", " S "]
+    keys: {B: "block:black_cobblestone", S: stick}
+
+black_stone_shovel:
+  name: "<#6a6275>Black Stone Shovel"
+  base: stone_shovel
+  texture: black_stone_shovel
+  recipe:
+    shape: [" B ", " S ", " S "]
+    keys: {B: "block:black_cobblestone", S: stick}
+
+black_stone_hoe:
+  name: "<#6a6275>Black Stone Hoe"
+  base: stone_hoe
+  texture: black_stone_hoe
+  recipe:
+    shape: ["BB ", " S ", " S "]
+    keys: {B: "block:black_cobblestone", S: stick}

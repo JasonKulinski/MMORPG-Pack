@@ -1,0 +1,16 @@
+# Custom blocks. Each one becomes its own block with its own texture, item, mining speed and drops.
+# After editing: /rpg reload, then players accept the updated resource pack.
+#
+#   name:        item name (MiniMessage colors work)
+#   texture:     a 16x16 PNG in plugins/RPGCore/textures/block/ (without .png). Same on every side.
+#   break-like:  a vanilla block it mines and sounds like (tool, drops-need-a-tool, sounds). Default: stone
+#   hardness:    how long it takes to mine. Default: the break-like block's. Stone 1.5, cobblestone 2, deepslate 3, obsidian 50
+#   breakable:   false = only creative players can break it (good for build walls)
+#
+# Use /rpg block list to see the WorldEdit name of each block, and /rpg block give <id> to get it.
+
+black_cobblestone:
+  name: "<#4a4352>Black Cobblestone"
+  texture: black_cobblestone
+  break-like: cobblestone
+  breakable: true

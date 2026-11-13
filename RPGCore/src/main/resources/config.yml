@@ -1,0 +1,35 @@
+# XP to reach the next level = base-xp * level ^ exponent  (level 1 -> 100, level 10 -> ~3162)
+# From late-start on, XP grows faster: the curve continues with late-exponent instead
+# (level 25 -> 12,500, level 50 -> ~70,700, level 99 -> ~390,000).
+leveling:
+  max-level: 100
+  base-xp: 100
+  exponent: 1.5
+  late-start: 25
+  late-exponent: 2.5
+
+# Vanilla hostile mobs (zombies, creepers...) can't spawn. RPGCore mobs, /summon and spawn eggs still can.
+spawning:
+  block-vanilla-hostiles: true
+  # Spawn zones (/rpg zone) only spawn while a player is within this many blocks of the zone's edge,
+  # and never closer than zone-min-player-distance to a player.
+  zone-player-range: 48
+  zone-min-player-distance: 8
+
+# /stats look. true = the spellbook (needs the RPGCore resource pack). false = plain text in chat.
+gui:
+  custom-assets: true
+
+# The plugin hosts plugins/RPGCore/RPGCore-pack.zip itself and offers it to players when they join.
+resource-pack:
+  enabled: true
+  port: 8163
+  # The address players use to download the pack. "localhost" works for you on this PC.
+  # For friends, change it to the address they connect to (your LAN IP or public IP/domain) and open the port.
+  host: localhost
+  required: false
+  prompt: "<gold>RPGCore</gold> <gray>uses a resource pack for menus and icons."
+
+# Mana regenerates this % of max mana every second.
+mana:
+  regen-percent-per-second: 2

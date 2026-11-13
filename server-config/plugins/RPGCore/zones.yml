@@ -1,0 +1,78 @@
+crypt_tree_1:
+  world: world
+  x: 1992.5
+  y: 73.0
+  z: 1351.5
+  radius: 10.0
+  max: 3
+  respawn-seconds: 8.0
+  mobs:
+    ghoul: 2
+    bone_archer: 1
+crypt_waters_1:
+  world: world
+  x: 2007.5
+  y: 94.0
+  z: 1419.5
+  radius: 20.0
+  max: 10
+  respawn-seconds: 8.0
+  mobs:
+    ghoul: 4
+    bone_archer: 3
+    crypt_knight: 1
+crypt_hill_1:
+  world: world
+  x: 1947.5
+  y: 91.0
+  z: 1360.5
+  radius: 6.0
+  max: 3
+  respawn-seconds: 8.0
+  mobs:
+    ghoul: 1
+    bone_archer: 1
+    crypt_knight: 1
+crypt_flat_1:
+  world: world
+  x: 1936.5
+  y: 77.0
+  z: 1330.5
+  radius: 3.0
+  max: 2
+  respawn-seconds: 8.0
+  mobs:
+    ghoul: 1
+    bone_archer: 1
+crypt_flat_2:
+  world: world
+  x: 1980.5
+  y: 73.0
+  z: 1292.5
+  radius: 3.0
+  max: 2
+  respawn-seconds: 8.0
+  mobs:
+    ghoul: 1
+    bone_archer: 1
+crypt_cave_1:
+  world: world
+  x: 2012.5
+  y: 58.0
+  z: 1337.5
+  radius: 5.0
+  max: 2
+  respawn-seconds: 8.0
+  mobs:
+    ghoul: 1
+    bone_archer: 1
+crypt_cave_2:
+  world: world
+  x: 1995.5
+  y: 57.0
+  z: 1389.5
+  radius: 2.0
+  max: 1
+  respawn-seconds: 8.0
+  mobs:
+    ghoul: 1
