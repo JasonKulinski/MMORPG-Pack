@@ -128,7 +128,7 @@ public class StatsMenu {
         // line 2: flourish (art)
         for (int i = 0; i < STATS.length; i++) {
             Stat s = STATS[i];
-            String value = fmt(c.stat(s, level)) + (s.label.endsWith("%") ? "%" : "");
+            String value = fmt(pm.stat(target, s)) + (s.label.endsWith("%") ? "%" : "");
             page.row(3 + i, s.label.replace(" %", ""), value, RIGHT_X0, RIGHT_X1, INK, VALUE);
         }
     }

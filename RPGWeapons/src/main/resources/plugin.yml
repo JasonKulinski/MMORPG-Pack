@@ -1,0 +1,15 @@
+name: RPGWeapons
+version: 0.1.0
+main: dev.jason.rpgweapons.RPGWeapons
+api-version: "1.21.4"
+description: Weapons with stats and mana abilities, built on RPGCore.
+depend: [RPGCore]
+commands:
+  weapons:
+    description: RPGWeapons commands
+    usage: /weapons list | give <id> [player]
+    permission: rpgweapons.admin
+permissions:
+  rpgweapons.admin:
+    description: Give weapons.
+    default: op

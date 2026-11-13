@@ -29,10 +29,14 @@ import java.util.Map;
 
 /**
  * Custom items from items.yml (tools, weapons, materials). Each one is a vanilla item underneath (so a
- * black stone pickaxe mines and wears out like a stone pickaxe) with its own name, texture and recipe.
+ * black stone pickaxe mines and wears out like a stone pickaxe) with its own name, texture, recipe and stats.
+ *
+ * Other plugins (e.g. RPGWeapons) can add items with register(...), then call packHost().load() so their
+ * textures are added to the resource pack.
  */
 public class CustomItemManager implements Listener {
-    public record CustomItem(String id, String name, Material base, String texture, ConfigurationSection recipe) {}
+    public record CustomItem(String id, String name, Material base, File texture, ConfigurationSection recipe,
+                             Map<Stat, Double> stats) {}
 
     private static final MiniMessage MM = MiniMessage.miniMessage();
     private static final String[] DEFAULT_TEXTURES = {"black_stone_sword", "black_stone_pickaxe", "black_stone_axe",
@@ -42,6 +46,8 @@ public class CustomItemManager implements Listener {
     private final NamespacedKey itemKey;
     private final Map<String, CustomItem> items = new LinkedHashMap<>();
     private final List<NamespacedKey> recipes = new ArrayList<>();
+    /** Items registered by other plugins; kept across /rpg reload. */
+    private final Map<String, CustomItem> external = new LinkedHashMap<>();
 
     public CustomItemManager(RPGCore plugin) {
         this.plugin = plugin;
@@ -68,9 +74,19 @@ public class CustomItemManager implements Listener {
                 plugin.getLogger().warning("items.yml: " + id + " has an unknown base item.");
                 continue;
             }
-            items.put(id, new CustomItem(id, s.getString("name", id), base, s.getString("texture", id),
-                    s.getConfigurationSection("recipe")));
+            Map<Stat, Double> stats = new LinkedHashMap<>();
+            ConfigurationSection st = s.getConfigurationSection("stats");
+            if (st != null) {
+                for (String k : st.getKeys(false)) {
+                    Stat stat = Stat.fromKey(k);
+                    if (stat == null) plugin.getLogger().warning("items.yml: unknown stat '" + k + "' on " + id);
+                    else stats.put(stat, st.getDouble(k));
+                }
+            }
+            File tex = new File(plugin.getDataFolder(), "textures/item/" + s.getString("texture", id) + ".png");
+            items.put(id, new CustomItem(id, s.getString("name", id), base, tex, s.getConfigurationSection("recipe"), stats));
         }
+        items.putAll(external);
         // Recipes after all items are known, so recipes can use other custom items.
         for (CustomItem it : items.values()) addRecipe(it);
         Bukkit.getOnlinePlayers().forEach(p -> p.discoverRecipes(recipes));
@@ -117,6 +133,24 @@ public class CustomItemManager implements Listener {
         return m == null ? null : new RecipeChoice.MaterialChoice(m);
     }
 
+    /**
+     * Adds an item from another plugin. texture is a 16x16 PNG anywhere on disk. Call packHost().load()
+     * after registering so the texture is added to the resource pack.
+     */
+    public CustomItem register(String id, String name, Material base, File texture, Map<Stat, Double> stats) {
+        CustomItem ci = new CustomItem(id, name, base, texture, null, new LinkedHashMap<>(stats));
+        external.put(id, ci);
+        items.put(id, ci);
+        return ci;
+    }
+
+    /** The custom item this stack is, or null. */
+    public CustomItem of(ItemStack it) {
+        if (it == null || it.isEmpty() || !it.hasItemMeta()) return null;
+        String id = it.getItemMeta().getPersistentDataContainer().get(itemKey, PersistentDataType.STRING);
+        return id == null ? null : items.get(id);
+    }
+
     public CustomItem get(String id) {
         return items.get(id);
     }
@@ -132,25 +166,25 @@ public class CustomItemManager implements Listener {
         meta.setItemModel(new NamespacedKey("rpgcore", "item/" + ci.id()));
         meta.getPersistentDataContainer().set(itemKey, PersistentDataType.STRING, ci.id());
         it.setItemMeta(meta);
+        ItemStats.apply(it, ci.stats());
         return it;
     }
 
     /** Textures, models and item definitions for the resource pack. */
     public Map<String, byte[]> packFiles() {
         Map<String, byte[]> files = new LinkedHashMap<>();
-        File texDir = new File(plugin.getDataFolder(), "textures/item");
         for (CustomItem ci : items.values()) {
-            File png = new File(texDir, ci.texture() + ".png");
+            File png = ci.texture();
             try {
-                if (png.exists()) files.put("assets/rpgcore/textures/item/" + ci.texture() + ".png", Files.readAllBytes(png.toPath()));
-                else plugin.getLogger().warning("Missing texture for " + ci.id() + ": textures/item/" + ci.texture() + ".png");
+                if (png.exists()) files.put("assets/rpgcore/textures/item/" + ci.id() + ".png", Files.readAllBytes(png.toPath()));
+                else plugin.getLogger().warning("Missing texture for " + ci.id() + ": " + png);
             } catch (IOException e) {
                 plugin.getLogger().warning("Could not read " + png + ": " + e.getMessage());
             }
             // Tools and weapons are held like tools; anything else like a flat item.
             String parent = isHandheld(ci.base()) ? "minecraft:item/handheld" : "minecraft:item/generated";
             files.put("assets/rpgcore/models/item/" + ci.id() + ".json", utf8(
-                    "{\"parent\": \"" + parent + "\", \"textures\": {\"layer0\": \"rpgcore:item/" + ci.texture() + "\"}}\n"));
+                    "{\"parent\": \"" + parent + "\", \"textures\": {\"layer0\": \"rpgcore:item/" + ci.id() + "\"}}\n"));
             files.put("assets/rpgcore/items/item/" + ci.id() + ".json", utf8(
                     "{\"model\": {\"type\": \"minecraft:model\", \"model\": \"rpgcore:item/" + ci.id() + "\"}}\n"));
         }

@@ -6,6 +6,8 @@
 #   texture:  a 16x16 PNG in plugins/RPGCore/textures/item/ (without .png)
 #   recipe:   shape = 3 rows (spaces are empty slots); keys = what each letter is:
 #             a vanilla item (stick), a custom block (block:black_cobblestone) or a custom item (item:<id>)
+#   stats:    optional. Stats added while the item is held (or worn, for armor), e.g.
+#             stats: {attack: 40, crit_chance: 5}   (same stat names as classes.yml)
 
 black_stone_sword:
   name: "<#6a6275>Black Stone Sword"

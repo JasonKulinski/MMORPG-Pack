@@ -1,0 +1,22 @@
+# Weapons. Each works like its vanilla base item, plus RPG stats while held and an optional ability.
+# After editing: restart the server (or /rpg reload, then reload this plugin).
+#
+#   name:     item name (MiniMessage colors work)
+#   base:     the vanilla item it works like (iron_sword, bow, mace...)
+#   texture:  a 16x16 PNG in plugins/RPGWeapons/textures/ (without .png)
+#   stats:    added to the player's class stats while held. Same names as RPGCore's classes.yml:
+#             health, mana, attack, defense, damage_reduction, pierce, crit_chance, crit_damage,
+#             life_steal, slowness, poison, speed
+#   ability:  optional right-click ability: type (dash), mana cost, cooldown in seconds
+
+ember_blade:
+  name: "<#ff7a2e>Ember Blade"
+  base: iron_sword
+  texture: ember_blade
+  stats:
+    attack: 60
+    crit_chance: 5
+  ability:
+    type: dash
+    mana: 30
+    cooldown: 4

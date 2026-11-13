@@ -20,7 +20,12 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
+import org.bukkit.Bukkit;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -178,6 +183,27 @@ public class CombatListener implements Listener {
 
     @EventHandler
     public void onRespawn(PlayerRespawnEvent e) {
-        plugin.getServer().getScheduler().runTask(plugin, () -> plugin.players().applyStats(e.getPlayer()));
+        Bukkit.getScheduler().runTask(plugin, () -> plugin.players().applyStats(e.getPlayer()));
+    }
+
+    /* Item stats count while held or worn: re-apply Speed when what the player holds or wears changes. */
+    @EventHandler
+    public void onHeld(PlayerItemHeldEvent e) {
+        Bukkit.getScheduler().runTask(plugin, () -> plugin.players().applyStats(e.getPlayer()));
+    }
+
+    @EventHandler
+    public void onArmor(PlayerArmorChangeEvent e) {
+        Bukkit.getScheduler().runTask(plugin, () -> plugin.players().applyStats(e.getPlayer()));
+    }
+
+    @EventHandler
+    public void onSwap(PlayerSwapHandItemsEvent e) {
+        Bukkit.getScheduler().runTask(plugin, () -> plugin.players().applyStats(e.getPlayer()));
+    }
+
+    @EventHandler
+    public void onInvClick(InventoryClickEvent e) {
+        if (e.getWhoClicked() instanceof Player p) Bukkit.getScheduler().runTask(plugin, () -> plugin.players().applyStats(p));
     }
 }
