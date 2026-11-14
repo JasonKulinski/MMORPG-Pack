@@ -1,9 +1,9 @@
 name: RPGTowns
-version: 0.1.0
+version: 0.2.0
 main: dev.jason.rpgtowns.RPGTowns
 api-version: "1.21.4"
 description: Towns with a Planner NPC, player-designed buildings, voting, and plots.
-depend: [WorldEdit]
+depend: [WorldEdit, RPGCore]
 commands:
   towns:
     description: RPGTowns commands

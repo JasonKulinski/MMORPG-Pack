@@ -147,8 +147,6 @@ public class CustomBlockManager implements Listener {
         byKey.clear();
         File file = new File(plugin.getDataFolder(), "blocks.yml");
         if (!file.exists()) plugin.saveResource("blocks.yml", false);
-        File tex = new File(plugin.getDataFolder(), "textures/block/black_cobblestone.png");
-        if (!tex.exists()) plugin.saveResource("textures/block/black_cobblestone.png", false);
 
         // Which note block state each block uses. Kept in its own file so a block keeps its look forever,
         // even if other blocks are added or removed.
@@ -182,6 +180,11 @@ public class CustomBlockManager implements Listener {
                 }
                 states.set(id, st.getAsString());
                 statesChanged = true;
+            }
+            // Built-in textures (black cobblestone, red quartz) are copied out the first time they're needed.
+            String texName = "textures/block/" + s.getString("texture", id) + ".png";
+            if (!new File(plugin.getDataFolder(), texName).exists() && plugin.getResource(texName) != null) {
+                plugin.saveResource(texName, false);
             }
             CustomBlock b = new CustomBlock(id, s.getString("name", id), s.getString("texture", id),
                     likeMat.createBlockData(), (float) s.getDouble("hardness", likeMat.getHardness()),
@@ -453,7 +456,7 @@ public class CustomBlockManager implements Listener {
 
     @EventHandler
     public void onCraft(PrepareItemCraftEvent e) {
-        if (e.getRecipe() instanceof Keyed k && k.getKey().getNamespace().equals(itemKey.getNamespace())) return;
+        if (e.getRecipe() instanceof Keyed k && !k.getKey().getNamespace().equals("minecraft")) return; // our / other plugins' recipes
         for (ItemStack it : e.getInventory().getMatrix()) {
             if (of(it) != null) {
                 e.getInventory().setResult(null);

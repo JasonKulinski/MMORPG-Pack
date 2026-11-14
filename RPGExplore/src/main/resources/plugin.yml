@@ -1,0 +1,14 @@
+name: RPGExplore
+version: 0.1.0
+main: dev.jason.rpgexplore.RPGExplore
+api-version: "1.21.4"
+description: The world outside towns - level bands, wild enemies, traders, side quests, pixie areas, territories, dungeons and bosses.
+depend: [RPGCore, RPGTowns]
+commands:
+  explore:
+    description: RPGExplore commands
+    usage: /explore help
+permissions:
+  rpgexplore.admin:
+    description: Create areas, territories, dungeons and boss arenas.
+    default: op

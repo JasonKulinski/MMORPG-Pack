@@ -1,5 +1,5 @@
 name: RPGCore
-version: 0.3.0
+version: 0.4.0
 main: dev.jason.rpgcore.RPGCore
 api-version: "1.21.4"
 description: Classes, stats, leveling from custom mobs, and class checkpoints.
@@ -11,6 +11,9 @@ commands:
   stats:
     description: Open your stats book
     usage: /stats
+  wallet:
+    description: Your copper and ambrosia
+    usage: /wallet [deposit | withdraw <copper|ambrosia> <amount>]
 permissions:
   rpgcore.admin:
     description: Create classes, spawn mobs, place checkpoints, edit players.

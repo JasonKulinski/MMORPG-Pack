@@ -33,24 +33,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-/** The town Planner NPC and all its menus (Paper dialog screens). */
+/** The town NPCs (Planner and Treasurer) and all their menus (Paper dialog screens). */
 public class TownMenu implements Listener {
     private record Button(String label, Consumer<Player> action) {}
 
     private static final MiniMessage MM = MiniMessage.miniMessage();
     private final RPGTowns plugin;
-    private final NamespacedKey npcKey;
+    private final NamespacedKey npcKey, kindKey;
 
     public TownMenu(RPGTowns plugin) {
         this.plugin = plugin;
         this.npcKey = new NamespacedKey(plugin, "town");
+        this.kindKey = new NamespacedKey(plugin, "npc_kind");
     }
 
     // ------------------------------------------------------------------ the NPC
 
-    public Mannequin spawnPlanner(Town t, Location at) {
+    /** kind: "planner" or "treasurer". */
+    public Mannequin spawnNpc(Town t, Location at, String kind) {
         return at.getWorld().spawn(at, Mannequin.class, m -> {
-            m.customName(MM.deserialize("<gold>" + t.name + " Planner"));
+            m.customName(MM.deserialize("<gold>" + t.name + (kind.equals("treasurer") ? " Treasurer" : " Planner")));
+            m.getPersistentDataContainer().set(kindKey, PersistentDataType.STRING, kind);
             m.setCustomNameVisible(true);
             m.setDescription(MM.deserialize("<gray>Right-click"));
             m.setImmovable(true);
@@ -71,7 +74,11 @@ public class TownMenu implements Listener {
         Town t = townOfNpc(e.getRightClicked());
         if (t == null) return;
         e.setCancelled(true);
-        main(e.getPlayer(), t);
+        if ("treasurer".equals(e.getRightClicked().getPersistentDataContainer().get(kindKey, PersistentDataType.STRING))) {
+            treasurer(e.getPlayer(), t);
+        } else {
+            main(e.getPlayer(), t);
+        }
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -275,6 +282,75 @@ public class TownMenu implements Listener {
         for (Player online : Bukkit.getOnlinePlayers()) {
             if (online != except && t.residents.contains(online.getUniqueId())) online.sendMessage(MM.deserialize(message));
         }
+    }
+
+    // ------------------------------------------------------------------ the Treasurer
+
+    private static final java.util.Set<org.bukkit.Material> STONE = java.util.EnumSet.of(org.bukkit.Material.STONE,
+            org.bukkit.Material.COBBLESTONE, org.bukkit.Material.COBBLED_DEEPSLATE, org.bukkit.Material.DEEPSLATE,
+            org.bukkit.Material.BLACKSTONE, org.bukkit.Material.ANDESITE, org.bukkit.Material.DIORITE,
+            org.bukkit.Material.GRANITE, org.bukkit.Material.TUFF);
+
+    public void treasurer(Player p, Town t) {
+        dev.jason.rpgcore.Wallet w = rpgWallet();
+        String body = "<gold><bold>" + t.name + " treasury</bold></gold>\n"
+                + "<#d9884a>Copper: <white>" + t.treasury.getOrDefault("copper", 0L)
+                + "   <#f2d36b>Ambrosia: <white>" + t.treasury.getOrDefault("ambrosia", 0L) + "\n"
+                + "<gray>Wood: <white>" + t.treasury.getOrDefault("wood", 0L)
+                + "   <gray>Stone: <white>" + t.treasury.getOrDefault("stone", 0L) + "\n\n"
+                + "<gray>Your wallet: <#d9884a>" + w.balance(p, dev.jason.rpgcore.Wallet.Currency.COPPER) + " copper  <#f2d36b>"
+                + w.balance(p, dev.jason.rpgcore.Wallet.Currency.AMBROSIA) + " ambrosia";
+        boolean resident = t.residents.contains(p.getUniqueId());
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(new Button("Deposit my coins", pl -> {
+            pl.sendMessage(MM.deserialize("<green>Deposited " + w.depositAll(pl) + " items into your wallet."));
+            treasurer(pl, t);
+        }));
+        buttons.add(new Button("Withdraw 10 copper coins", pl -> withdraw(pl, t, dev.jason.rpgcore.Wallet.Currency.COPPER, 10)));
+        buttons.add(new Button("Withdraw 64 copper coins", pl -> withdraw(pl, t, dev.jason.rpgcore.Wallet.Currency.COPPER, 64)));
+        buttons.add(new Button("Withdraw 1 ambrosia", pl -> withdraw(pl, t, dev.jason.rpgcore.Wallet.Currency.AMBROSIA, 1)));
+        if (resident) {
+            buttons.add(new Button("Give town 10 copper", pl -> donate(pl, t, dev.jason.rpgcore.Wallet.Currency.COPPER, 10)));
+            buttons.add(new Button("Give town 1 ambrosia", pl -> donate(pl, t, dev.jason.rpgcore.Wallet.Currency.AMBROSIA, 1)));
+            buttons.add(new Button("Give town my logs", pl -> donateItems(pl, t, "wood", m -> org.bukkit.Tag.LOGS.isTagged(m))));
+            buttons.add(new Button("Give town my stone", pl -> donateItems(pl, t, "stone", STONE::contains)));
+        } else {
+            body += "\n\n<gray>Only residents can give to the town.";
+        }
+        show(p, t.name + " Treasurer", body, buttons, null);
+    }
+
+    private dev.jason.rpgcore.Wallet rpgWallet() {
+        return ((dev.jason.rpgcore.RPGCore) Bukkit.getPluginManager().getPlugin("RPGCore")).wallet();
+    }
+
+    private void withdraw(Player p, Town t, dev.jason.rpgcore.Wallet.Currency c, int amount) {
+        if (!rpgWallet().withdraw(p, c, amount)) p.sendMessage(MM.deserialize("<red>Not enough in your wallet."));
+        treasurer(p, t);
+    }
+
+    private void donate(Player p, Town t, dev.jason.rpgcore.Wallet.Currency c, int amount) {
+        if (rpgWallet().take(p, c, amount)) {
+            plugin.towns().addToTreasury(t, c.key, amount);
+            p.sendMessage(MM.deserialize("<green>Gave " + amount + " " + c.key + " to " + t.name + "."));
+        } else {
+            p.sendMessage(MM.deserialize("<red>Not enough in your wallet."));
+        }
+        treasurer(p, t);
+    }
+
+    private void donateItems(Player p, Town t, String resource, java.util.function.Predicate<org.bukkit.Material> match) {
+        int count = 0;
+        org.bukkit.inventory.ItemStack[] contents = p.getInventory().getStorageContents();
+        for (int i = 0; i < contents.length; i++) {
+            if (contents[i] == null || !match.test(contents[i].getType()) || contents[i].hasItemMeta()) continue;
+            count += contents[i].getAmount();
+            p.getInventory().setItem(i, null);
+        }
+        if (count > 0) plugin.towns().addToTreasury(t, resource, count);
+        p.sendMessage(MM.deserialize(count > 0 ? "<green>Gave " + count + " " + resource + " to " + t.name + "."
+                : "<red>You don't have any."));
+        treasurer(p, t);
     }
 
     // ------------------------------------------------------------------ helpers

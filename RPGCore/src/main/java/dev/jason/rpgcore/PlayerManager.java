@@ -39,11 +39,12 @@ public class PlayerManager {
         return p.getPersistentDataContainer().getOrDefault(xpKey, PersistentDataType.DOUBLE, 0.0);
     }
 
-    /** Stat value for a player: their class's value plus their held item and armor, up to the stat's cap. 0 with no class. */
+    /** Stat value for a player: their class's value plus held items (both hands) and armor, up to the stat's cap. 0 with no class. */
     public double stat(Player p, Stat stat) {
         RpgClass c = getClass(p);
         if (c == null) return 0;
-        double value = c.stat(stat, getLevel(p)) + ItemStats.get(p.getInventory().getItemInMainHand(), stat);
+        double value = c.stat(stat, getLevel(p)) + ItemStats.get(p.getInventory().getItemInMainHand(), stat)
+                + ItemStats.get(p.getInventory().getItemInOffHand(), stat);
         for (org.bukkit.inventory.ItemStack armor : p.getInventory().getArmorContents()) value += ItemStats.get(armor, stat);
         return Math.min(value, stat.cap);
     }

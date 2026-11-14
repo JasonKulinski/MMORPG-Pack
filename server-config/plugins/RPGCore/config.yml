@@ -33,3 +33,9 @@ resource-pack:
 # Mana regenerates this % of max mana every second.
 mana:
   regen-percent-per-second: 2
+
+# Custom mob levels (used by RPGExplore's level bands). Level 1 = the stats in mobs.yml.
+# Each level above 1 adds this fraction to health, damage and defense (0.15 = +15% per level) and to XP.
+mob-levels:
+  stat-per-level: 0.15
+  xp-per-level: 0.25

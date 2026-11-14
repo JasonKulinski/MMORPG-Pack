@@ -207,6 +207,47 @@ public class CustomItemManager implements Listener {
         e.getPlayer().discoverRecipes(recipes);
     }
 
+    /*
+     * Custom materials and currency (copper coins, ambrosia, potions...) are vanilla items underneath (paper etc.).
+     * Keep them out of vanilla recipes, workstations and villager trades. Tools and armor (items with durability)
+     * may still be repaired and used normally. Recipes added by plugins (not "minecraft:") always work.
+     */
+    private boolean isCustomMaterial(ItemStack it) {
+        return of(it) != null && it.getType().getMaxDurability() == 0;
+    }
+
+    @EventHandler
+    public void onCraft(org.bukkit.event.inventory.PrepareItemCraftEvent e) {
+        if (e.getRecipe() instanceof org.bukkit.Keyed k && !k.getKey().getNamespace().equals("minecraft")) return;
+        for (ItemStack it : e.getInventory().getMatrix()) {
+            if (isCustomMaterial(it)) {
+                e.getInventory().setResult(null);
+                return;
+            }
+        }
+    }
+
+    @EventHandler
+    public void onWorkstation(com.destroystokyo.paper.event.inventory.PrepareResultEvent e) {
+        for (ItemStack it : e.getInventory().getContents()) {
+            if (isCustomMaterial(it)) {
+                e.setResult(null);
+                return;
+            }
+        }
+    }
+
+    /** Trades made by plugins with custom items as the price (e.g. 10 copper coins) are fine; vanilla ones are not. */
+    @EventHandler(ignoreCancelled = true)
+    public void onTrade(io.papermc.paper.event.player.PlayerTradeEvent e) {
+        boolean priceIsCustom = e.getTrade().getIngredients().stream().anyMatch(i -> of(i) != null);
+        if (priceIsCustom) return;
+        if (e.getPlayer().getOpenInventory().getTopInventory() instanceof org.bukkit.inventory.MerchantInventory mi
+                && (isCustomMaterial(mi.getItem(0)) || isCustomMaterial(mi.getItem(1)))) {
+            e.setCancelled(true);
+        }
+    }
+
     /** Older custom block items are note blocks, which count as wood: don't let them burn as furnace fuel. */
     @EventHandler(ignoreCancelled = true)
     public void onFuel(FurnaceBurnEvent e) {

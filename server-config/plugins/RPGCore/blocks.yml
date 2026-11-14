@@ -14,3 +14,9 @@ black_cobblestone:
   texture: black_cobblestone
   break-like: cobblestone
   breakable: true
+
+red_quartz_crystal:
+  name: "<#e0405a>Red Quartz Crystal"
+  texture: red_quartz_crystal
+  break-like: amethyst_block
+  breakable: true

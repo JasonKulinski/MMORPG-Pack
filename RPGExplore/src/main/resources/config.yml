@@ -1,0 +1,130 @@
+# RPGExplore settings. After editing: /explore reload
+
+# ---------------------------------------------------------------- level bands
+# Enemies get stronger the further you are from the nearest town center (/towns center).
+# Band 0 = 0-499 blocks: levels 1-5, band 1 = 500-999: levels 6-10, and so on.
+level-bands:
+  band-size: 500
+  levels-per-band: 5
+  # No wild enemies spawn this close to a town center.
+  safe-radius: 120
+
+# ---------------------------------------------------------------- wild enemies
+wild-spawns:
+  enabled: true
+  worlds: [world]
+  interval-seconds: 8
+  max-per-player: 6         # wild enemies alive near each player
+  min-distance: 18
+  max-distance: 36
+  despawn-distance: 96      # wild enemies further than this from every player are removed
+
+# Which enemies spawn near each town (by town id), with the highest level each can be.
+# Towns not listed use "default". Mobs come from RPGCore's mobs.yml or the "mobs" list below.
+themes:
+  default:
+    ghoul: 50
+    bone_archer: 50
+  # example: icevale: {ice_zombie: 40, stray_archer: 40}
+
+# Extra enemies for exploring (registered into RPGCore; same fields as RPGCore's mobs.yml).
+# Stats are for level 1; RPGCore scales them up per level (mob-levels in RPGCore's config.yml).
+mobs:
+  ice_zombie:
+    type: ZOMBIE
+    name: "<aqua>Ice Zombie"
+    health: 180
+    damage: 70
+    defense: 8
+    xp: 3
+    leather-color: "#a8dcff"
+  ember_husk:
+    type: HUSK
+    name: "<#ff7a2e>Ember Husk"
+    health: 160
+    damage: 85
+    defense: 4
+    xp: 3
+  evil_pixie:
+    type: VEX
+    name: "<light_purple>Evil Pixie"
+    health: 70
+    damage: 45
+    xp: 4
+  hendor:
+    type: PIGLIN_BRUTE
+    name: "<gold><bold>Hendor"
+    health: 2200
+    damage: 120
+    defense: 60
+    speed: 0.32
+    scale: 1.4
+    xp: 300
+
+# ---------------------------------------------------------------- loot
+# Every custom enemy that dies drops copper coins and sometimes ambrosia (never mined, only found).
+drops:
+  copper-per-level: 1        # drops 1 to (level x this) coins
+  ambrosia-chance: 0.02      # 2% ...
+  ambrosia-chance-per-level: 0.002   # ... plus 0.2% per level
+
+# ---------------------------------------------------------------- wandering traders
+traders:
+  enabled: true
+  chance-per-minute: 0.12    # per player out in the wilds
+  lifetime-minutes: 5
+  # cost = copper coins. item = an RPGCore/RPGExplore custom item id, or minecraft:<item>.
+  trades:
+    - {cost: 10, item: small_health_potion, amount: 1}
+    - {cost: 4, item: "minecraft:bread", amount: 6}
+    - {cost: 6, item: "minecraft:torch", amount: 16}
+    - {cost: 15, item: "minecraft:arrow", amount: 32}
+
+# ---------------------------------------------------------------- potions
+potions:
+  small_health_potion: 0.25  # heals this fraction of max health
+  healing_potion: 0.6
+
+# ---------------------------------------------------------------- side quests
+quests:
+  enabled: true
+  chance-per-minute: 0.08
+  lifetime-minutes: 15
+  # Fetch quests: the traveler wants some items.
+  fetch:
+    - {item: "minecraft:oak_log", amount: 16, copper: 8, xp: 30, text: "My cart broke down. Could you bring me 16 oak logs?"}
+    - {item: "minecraft:wheat", amount: 20, copper: 6, xp: 25, text: "I'm starving. 20 wheat and I'll pay you well."}
+    - {item: "minecraft:string", amount: 8, copper: 10, xp: 35, text: "The spiders took my bowstrings. Bring me 8 string?"}
+  # Lost ring quest: a ring is hidden in a chest nearby. Return it for a reward, or keep it.
+  ring:
+    chance: 0.4              # share of quests that are ring quests
+    copper: 15
+    ambrosia: 1
+    xp: 50
+    distance: [20, 40]
+
+# ---------------------------------------------------------------- territories
+territories:
+  capture-seconds: 60        # standing in the capture circle uncontested
+  capture-radius: 6
+
+# ---------------------------------------------------------------- dungeons
+dungeons:
+  wave-delay-seconds: 5
+  reset-after-seconds: 30    # no players inside for this long: the dungeon resets
+
+# ---------------------------------------------------------------- bosses
+bosses:
+  hendor:
+    mob: hendor
+    level: 10
+    respawn-minutes: 30
+    trigger-distance: 32
+    slam-every-seconds: 8
+    slam-radius: 6
+    copper: 60
+    ambrosia: 3
+    # One-of-one drop: the first winner gets tier 0, every later winner one tier lower (down to the last).
+    # Placeholder until the RPGWeapons team adds Hendor's Weighted Blade.
+    drop: hendors_token
+    tiers: ["<gold>Legendary", "<light_purple>Epic", "<aqua>Rare", "<green>Uncommon", "<gray>Common"]

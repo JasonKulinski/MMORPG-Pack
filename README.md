@@ -9,9 +9,11 @@ A Paper 26.3 server with an MMO RPG theme: classes, leveling, custom mobs, custo
 | `RPGCore/` | The custom plugin (Java). Classes, stats, leveling, the stats book, custom mobs, spawn zones, custom blocks and items, and the resource pack host. |
 | `RPGWeapons/` | Weapons plugin (starter): weapons with stats and mana abilities, defined in `weapons.yml`. Depends on RPGCore. |
 | `RPGTowns/` | Towns plugin: a Planner NPC per town, player-designed buildings built in an empty world, 1-5 voting, and plots. Needs WorldEdit. |
+| `RPGExplore/` | The world outside towns: level bands, wild enemies, coin drops, wandering traders, side quests, pixie areas, territories, dungeons, bosses. |
 | `RPGCore/tools/` | Python scripts that draw the textures and build the resource pack (`make_pack.py`). |
 | `server-config/` | The server's config files: RPGCore settings (`classes.yml`, `mobs.yml`, `blocks.yml`, `items.yml`, `zones.yml`...), WorldEdit config, the `zone_skies` datapack (custom biomes) and `start.bat`. |
-| `docs/` | WorldEdit cheat sheet with all the terraforming brushes used for each zone. |
+| `docs/` | WorldEdit cheat sheet (brushes per zone) and `world-building.md` (how to lay out the world for these plugins). |
+| `AGENTS.md` | **Read first if you're an AI assistant (or new here):** how everything fits together, rules of thumb, gotchas. |
 
 The world itself, server jars and logs are not in the repo.
 
@@ -40,7 +42,9 @@ gradle build
 cd ../RPGWeapons
 gradle build        # needs RPGCore built first
 cd ../RPGTowns
-gradle build
+gradle build        # needs RPGCore built first
+cd ../RPGExplore
+gradle build        # needs RPGCore and RPGTowns built first
 ```
 
 The resource pack:
@@ -76,6 +80,15 @@ Admin setup for a town:
 ```
 
 Data: `towns.yml`, `designs.yml`, saved designs in `schematics/<id>.schem`, and the design world `rpgtowns_design`.
+
+## Exploring (RPGExplore)
+
+Outside towns, enemies get stronger every 500 blocks from the nearest town center and are themed by that town.
+Every custom enemy drops copper coins (sometimes ambrosia); coins buy from wandering traders, go into your wallet,
+or are given to your town's treasury. Lost Travelers give side quests, evil pixie hollows hold red quartz for
+healing potions, towns fight over territories that pay into their treasury, dungeons throw waves of enemies,
+and Hendor is a one-of-one boss whose drop gets weaker for every later winner. Details and setup:
+`RPGExplore/README.md`.
 
 ## Writing a plugin on top of RPGCore (e.g. RPGWeapons)
 
@@ -114,6 +127,10 @@ Rule of thumb: RPGCore owns the damage math. Other plugins give items stats and 
 | `/weapons list` / `give <id> [player]` | RPGWeapons weapons |
 | `/towns create`, `alderman`, `npc`, `plot create/remove/show`, `list`, `sizes` | RPGTowns admin setup |
 | `/towns leave` | Leave the design world |
+| `/towns npc <town> treasurer`, `/towns center <town>` | Treasurer NPC, town middle (for danger levels) |
+| `/wallet`, `/wallet deposit`, `/wallet withdraw <copper\|ambrosia> <n>` | Copper and ambrosia |
+| `/explore area\|territory\|dungeon\|boss ...` | RPGExplore setup (see `RPGExplore/README.md`) |
+| `/explore level` | How dangerous it is where you stand |
 | `/rpg reload` | Reload all config files and resend the resource pack |
 
 ## Working together

@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-/** Towns, their Alderman, residents, vote threshold and plots. Saved in towns.yml. */
+/** Towns, their Alderman, residents, vote threshold, center, treasury and plots. Saved in towns.yml. */
 public class TownManager {
     public record PlotSize(String id, String label, int width, int height, boolean house) {
         public String describe() {
@@ -52,6 +52,10 @@ public class TownManager {
         public int threshold = 3;
         public final Set<UUID> residents = new LinkedHashSet<>();
         public final Map<String, Plot> plots = new LinkedHashMap<>();
+        /** The town's middle (set where the Planner is placed, or with /towns center). Used for distances. */
+        public Location center;
+        /** Shared town resources: copper, ambrosia, wood, stone. */
+        public final Map<String, Long> treasury = new LinkedHashMap<>();
 
         Town(String id, String name) {
             this.id = id;
@@ -93,6 +97,9 @@ public class TownManager {
             if (al != null) t.alderman = UUID.fromString(al);
             t.threshold = s.getInt("threshold", 3);
             for (String r : s.getStringList("residents")) t.residents.add(UUID.fromString(r));
+            t.center = s.getLocation("center");
+            ConfigurationSection tr = s.getConfigurationSection("treasury");
+            if (tr != null) for (String k : tr.getKeys(false)) t.treasury.put(k, tr.getLong(k));
             ConfigurationSection ps = s.getConfigurationSection("plots");
             if (ps != null) {
                 for (String pid : ps.getKeys(false)) {
@@ -117,6 +124,8 @@ public class TownManager {
             yml.set(b + "alderman", t.alderman == null ? null : t.alderman.toString());
             yml.set(b + "threshold", t.threshold);
             yml.set(b + "residents", t.residents.stream().map(UUID::toString).toList());
+            yml.set(b + "center", t.center);
+            t.treasury.forEach((k, v) -> yml.set(b + "treasury." + k, v));
             for (Plot p : t.plots.values()) {
                 String pb = b + "plots." + p.id + ".";
                 yml.set(pb + "world", p.world);
@@ -162,6 +171,27 @@ public class TownManager {
 
     public Collection<PlotSize> sizes() {
         return sizes.values();
+    }
+
+    /** Adds (or with a negative amount, removes) a shared resource. Keys: copper, ambrosia, wood, stone. */
+    public void addToTreasury(Town t, String resource, long amount) {
+        t.treasury.merge(resource, amount, Long::sum);
+        save();
+    }
+
+    /** The town whose center is nearest this location (same world), or null if no town has a center there. */
+    public Town nearest(Location loc) {
+        Town best = null;
+        double bestDist = Double.MAX_VALUE;
+        for (Town t : towns.values()) {
+            if (t.center == null || t.center.getWorld() == null || !t.center.getWorld().equals(loc.getWorld())) continue;
+            double d = t.center.distanceSquared(loc);
+            if (d < bestDist) {
+                bestDist = d;
+                best = t;
+            }
+        }
+        return best;
     }
 
     public Plot housePlotOf(Town t, UUID player) {

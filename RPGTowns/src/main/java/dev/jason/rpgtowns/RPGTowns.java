@@ -97,9 +97,22 @@ public class RPGTowns extends JavaPlugin {
                 msg(s, "<green>" + a[2] + " is now the Alderman of " + t.name + ".");
             }
             case "npc" -> {
-                if (t == null || !(s instanceof Player p)) { msg(s, "<red>/towns npc <town> (stand where it should be)"); return true; }
-                menus.spawnPlanner(t, p.getLocation());
-                msg(s, "<green>Placed the " + t.name + " Planner. Remove it with /kill @e[type=mannequin,distance=..2]");
+                if (t == null || !(s instanceof Player p)) { msg(s, "<red>/towns npc <town> [planner|treasurer] (stand where it should be)"); return true; }
+                boolean treasurer = a.length > 2 && a[2].equalsIgnoreCase("treasurer");
+                menus.spawnNpc(t, p.getLocation(), treasurer ? "treasurer" : "planner");
+                if (t.center == null) {
+                    t.center = p.getLocation().toBlockLocation();
+                    towns.save();
+                    msg(s, "<gray>Town center set here (change it with /towns center " + t.id + ").");
+                }
+                msg(s, "<green>Placed the " + t.name + (treasurer ? " Treasurer" : " Planner")
+                        + ". Remove it with /kill @e[type=mannequin,distance=..2]");
+            }
+            case "center" -> {
+                if (t == null || !(s instanceof Player p)) { msg(s, "<red>/towns center <town> (stand at the town's middle)"); return true; }
+                t.center = p.getLocation().toBlockLocation();
+                towns.save();
+                msg(s, "<green>" + t.name + "'s center is now here.");
             }
             case "plot" -> plotCmd(s, a);
             case "list" -> {
@@ -121,7 +134,8 @@ public class RPGTowns extends JavaPlugin {
                 msg(s, "<gold>RPGTowns");
                 msg(s, "<yellow>/towns create <id> <name...> <gray>- make a town");
                 msg(s, "<yellow>/towns alderman <town> <player> <gray>- set the Alderman");
-                msg(s, "<yellow>/towns npc <town> <gray>- place the town's Planner where you stand");
+                msg(s, "<yellow>/towns npc <town> [planner|treasurer] <gray>- place a town NPC where you stand");
+                msg(s, "<yellow>/towns center <town> <gray>- set the town's middle (used for danger levels)");
                 msg(s, "<yellow>/towns plot create <town> <plot> <size> <gray>- plot starting at your feet, going +X/+Z");
                 msg(s, "<yellow>/towns plot remove <town> <plot> | show <town>");
                 msg(s, "<yellow>/towns list | sizes | reload | leave");
@@ -166,8 +180,9 @@ public class RPGTowns extends JavaPlugin {
         List<String> out = new ArrayList<>();
         if (!s.hasPermission("rpgtowns.admin")) return a.length == 1 ? List.of("leave") : out;
         List<String> townIds = towns.all().stream().map(t -> t.id).toList();
-        if (a.length == 1) out.addAll(List.of("create", "alderman", "npc", "plot", "list", "sizes", "reload", "leave"));
-        else if (a.length == 2 && List.of("alderman", "npc").contains(a[0].toLowerCase())) out.addAll(townIds);
+        if (a.length == 1) out.addAll(List.of("create", "alderman", "npc", "center", "plot", "list", "sizes", "reload", "leave"));
+        else if (a.length == 2 && List.of("alderman", "npc", "center").contains(a[0].toLowerCase())) out.addAll(townIds);
+        else if (a.length == 3 && a[0].equalsIgnoreCase("npc")) out.addAll(List.of("planner", "treasurer"));
         else if (a.length == 2 && a[0].equalsIgnoreCase("plot")) out.addAll(List.of("create", "remove", "show"));
         else if (a.length == 3 && a[0].equalsIgnoreCase("plot")) out.addAll(townIds);
         else if (a.length == 3 && a[0].equalsIgnoreCase("alderman")) return null; // player names

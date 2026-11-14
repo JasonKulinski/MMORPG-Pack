@@ -14,6 +14,7 @@ public class RPGCore extends JavaPlugin {
     private SpawnZoneManager zones;
     private CustomBlockManager blocks;
     private CustomItemManager items;
+    private Wallet wallet;
 
     @Override
     public void onEnable() {
@@ -27,6 +28,8 @@ public class RPGCore extends JavaPlugin {
         zones = new SpawnZoneManager(this);
         blocks = new CustomBlockManager(this);
         items = new CustomItemManager(this);
+        wallet = new Wallet(this);
+        wallet.registerItems();
         reloadAll();
 
         getServer().getPluginManager().registerEvents(new CombatListener(this), this);
@@ -40,6 +43,11 @@ public class RPGCore extends JavaPlugin {
         if (rpg != null) {
             rpg.setExecutor(cmd);
             rpg.setTabCompleter(cmd);
+        }
+        PluginCommand walletCmd = getCommand("wallet");
+        if (walletCmd != null) {
+            walletCmd.setExecutor(wallet);
+            walletCmd.setTabCompleter(wallet);
         }
         PluginCommand stats = getCommand("stats");
         if (stats != null) stats.setExecutor(cmd);
@@ -75,6 +83,7 @@ public class RPGCore extends JavaPlugin {
     public SpawnZoneManager zones() { return zones; }
     public CustomBlockManager blocks() { return blocks; }
     public CustomItemManager items() { return items; }
+    public Wallet wallet() { return wallet; }
 
     @Override
     public void onDisable() {

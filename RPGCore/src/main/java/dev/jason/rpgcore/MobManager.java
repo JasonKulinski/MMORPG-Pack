@@ -26,18 +26,25 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/** Custom enemies from mobs.yml. Each spawned mob is tagged with its id so we can find its stats later. */
+/**
+ * Custom enemies from mobs.yml (plus any registered by other plugins). Each spawned mob is tagged with its id
+ * and level, so we can find its stats later. Level 1 is the mobs.yml stats; each level above adds
+ * mob-levels.stat-per-level (config.yml) to health, damage and defense, and xp-per-level to XP.
+ */
 public class MobManager {
     public record MobDef(String id, EntityType type, String name, double health, double damage, double speed,
                          double scale, double defense, double xp, ConfigurationSection equipment, String leatherColor) {}
 
     private final RPGCore plugin;
-    private final NamespacedKey mobKey;
+    private final NamespacedKey mobKey, levelKey;
     private final Map<String, MobDef> mobs = new LinkedHashMap<>();
+    /** Mobs registered by other plugins (e.g. RPGExplore); kept across /rpg reload. */
+    private final Map<String, MobDef> external = new LinkedHashMap<>();
 
     public MobManager(RPGCore plugin) {
         this.plugin = plugin;
         this.mobKey = new NamespacedKey(plugin, "mob");
+        this.levelKey = new NamespacedKey(plugin, "mob_level");
     }
 
     public void load() {
@@ -60,7 +67,14 @@ public class MobManager {
                     s.getDouble("scale", 1), s.getDouble("defense", 0), s.getDouble("xp", 10),
                     s.getConfigurationSection("equipment"), s.getString("leather-color")));
         }
+        mobs.putAll(external);
         plugin.getLogger().info("Loaded " + mobs.size() + " custom mobs.");
+    }
+
+    /** Adds a mob from another plugin (same fields as mobs.yml). */
+    public void register(MobDef def) {
+        external.put(def.id(), def);
+        mobs.put(def.id(), def);
     }
 
     public MobDef get(String id) {
@@ -71,18 +85,39 @@ public class MobManager {
         return mobs.values();
     }
 
-    /** The definition of a spawned custom mob, or null for normal entities. */
+    /** The stats of a spawned custom mob at its level, or null for normal entities. */
     public MobDef of(Entity e) {
-        return get(e.getPersistentDataContainer().get(mobKey, PersistentDataType.STRING));
+        MobDef base = get(e.getPersistentDataContainer().get(mobKey, PersistentDataType.STRING));
+        return base == null ? null : atLevel(base, level(e));
+    }
+
+    /** A spawned custom mob's level (1 if it has none). */
+    public int level(Entity e) {
+        return e.getPersistentDataContainer().getOrDefault(levelKey, PersistentDataType.INTEGER, 1);
+    }
+
+    /** The mob's stats at a level. Level 1 = mobs.yml; the name gets a "Lv N" tag above level 1. */
+    public MobDef atLevel(MobDef d, int level) {
+        if (level <= 1) return d;
+        double s = 1 + plugin.getConfig().getDouble("mob-levels.stat-per-level", 0.15) * (level - 1);
+        double x = 1 + plugin.getConfig().getDouble("mob-levels.xp-per-level", 0.25) * (level - 1);
+        return new MobDef(d.id(), d.type(), "<gray>Lv " + level + "</gray> " + d.name(), d.health() * s, d.damage() * s,
+                d.speed(), d.scale(), d.defense() * s, d.xp() * x, d.equipment(), d.leatherColor());
     }
 
     public LivingEntity spawn(MobDef def, Location loc) {
+        return spawn(def, loc, 1);
+    }
+
+    public LivingEntity spawn(MobDef base, Location loc, int level) {
+        MobDef def = atLevel(base, level);
         Entity raw = loc.getWorld().spawnEntity(loc, def.type());
         if (!(raw instanceof LivingEntity e)) {
             raw.remove();
             return null;
         }
         e.getPersistentDataContainer().set(mobKey, PersistentDataType.STRING, def.id());
+        if (level > 1) e.getPersistentDataContainer().set(levelKey, PersistentDataType.INTEGER, level);
         e.setCustomNameVisible(true);
         e.setRemoveWhenFarAway(false);
 
@@ -97,6 +132,9 @@ public class MobManager {
         if (e instanceof Zombie z) z.setShouldBurnInDay(false);
         if (e instanceof AbstractSkeleton s) s.setShouldBurnInDay(false);
         if (e instanceof Mob m) m.setCanPickupItems(false);
+        // Piglins and hoglins would turn into zombified versions in the Overworld.
+        if (e instanceof org.bukkit.entity.PiglinAbstract pa) pa.setImmuneToZombification(true);
+        if (e instanceof org.bukkit.entity.Hoglin h) h.setImmuneToZombification(true);
         equip(e, def);
         return e;
     }
